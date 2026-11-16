@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   Building2,
   Briefcase,
@@ -19,6 +20,7 @@ import { driveService } from '../../services/driveService'
 import { useToast } from '../../hooks/useToast'
 
 export default function RecruiterDashboard() {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [drives, setDrives] = useState([])
   const { error: toastError } = useToast()
@@ -79,11 +81,10 @@ export default function RecruiterDashboard() {
 
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant="outlineDark"
             size="sm"
             onClick={loadData}
             iconLeft={RefreshCw}
-            className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
           >
             Refresh
           </Button>
@@ -92,9 +93,7 @@ export default function RecruiterDashboard() {
             variant="primary"
             size="sm"
             iconLeft={Plus}
-            onClick={() => {
-              window.location.href = '/recruiter/drives'
-            }}
+            onClick={() => navigate('/recruiter/drives')}
           >
             Post Recruitment Drive
           </Button>
@@ -184,7 +183,9 @@ export default function RecruiterDashboard() {
                     </td>
 
                     <td className="py-3.5 px-4 font-mono font-medium text-slate-700">
-                      {d.min_cgpa != null ? `${d.min_cgpa} CGPA` : 'Any'}
+                      {d.eligibility_criteria?.min_cgpa ?? d.min_cgpa != null
+                        ? `${d.eligibility_criteria?.min_cgpa ?? d.min_cgpa} CGPA`
+                        : 'Any'}
                     </td>
 
                     <td className="py-3.5 px-4 font-semibold text-emerald-700">
@@ -209,12 +210,12 @@ export default function RecruiterDashboard() {
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
-                      <a
-                        href="/recruiter/applications"
+                      <Link
+                        to="/recruiter/applications"
                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
                       >
-                        Review Applicants →
-                      </a>
+                        Review Applicants &rarr;
+                      </Link>
                     </td>
                   </tr>
                 ))

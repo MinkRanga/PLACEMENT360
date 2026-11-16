@@ -30,13 +30,35 @@ export default function StudentDashboard() {
       setLoading(true)
       const [profData, activeDrives, myApps] = await Promise.all([
         studentService.getMyProfile().catch(() => null),
-        driveService.getDrives({ status: 'ACTIVE' }).catch(() => []),
+        driveService.getDrives().catch(() => []),
         driveService.getMyApplications().catch(() => []),
       ])
 
+      // Normalize drives response (handles both array and paginated { items: [...] } formats)
+      let normalizedDrives = []
+      if (Array.isArray(activeDrives)) {
+        normalizedDrives = activeDrives
+      } else if (Array.isArray(activeDrives?.items)) {
+        normalizedDrives = activeDrives.items
+      } else {
+        console.error('Unexpected drives API response structure:', activeDrives)
+        normalizedDrives = []
+      }
+
+      // Normalize applications response
+      let normalizedApps = []
+      if (Array.isArray(myApps)) {
+        normalizedApps = myApps
+      } else if (Array.isArray(myApps?.items)) {
+        normalizedApps = myApps.items
+      } else {
+        console.error('Unexpected applications API response structure:', myApps)
+        normalizedApps = []
+      }
+
       setProfile(profData)
-      setDrives(activeDrives || [])
-      setApplications(myApps || [])
+      setDrives(normalizedDrives)
+      setApplications(normalizedApps)
     } catch (err) {
       console.error('Error loading student dashboard', err)
       toastError('Could not sync student records from server.')
@@ -73,7 +95,9 @@ export default function StudentDashboard() {
     return <LoadingSpinner size="lg" message="Loading your student credentials and drives..." />
   }
 
-  const appliedDriveIds = new Set(applications.map((a) => a.drive_id))
+  const appliedDriveIds = new Set(
+    (Array.isArray(applications) ? applications : []).map((a) => a.drive_id)
+  )
 
   return (
     <div className="space-y-6">
@@ -132,7 +156,7 @@ export default function StudentDashboard() {
 
         <StatCard
           title="My Applications"
-          value={applications.length}
+          value={Array.isArray(applications) ? applications.length : 0}
           change="Submitted drive applications"
           changeType="neutral"
           icon={FileText}
@@ -141,7 +165,7 @@ export default function StudentDashboard() {
 
         <StatCard
           title="Campus Drives Open"
-          value={drives.length}
+          value={Array.isArray(drives) ? drives.length : 0}
           change="Currently accepting profiles"
           changeType="neutral"
           icon={Briefcase}
@@ -156,7 +180,7 @@ export default function StudentDashboard() {
         icon={Briefcase}
       >
         <div className="space-y-3">
-          {drives.length === 0 ? (
+          {!Array.isArray(drives) || drives.length === 0 ? (
             <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
               No active placement drives currently open. Check back periodically.
             </div>
@@ -174,9 +198,9 @@ export default function StudentDashboard() {
                       <Badge variant="info">{drive.job_role}</Badge>
                     </div>
                     <p className="text-xs text-slate-500">
-                      Min CGPA: <strong className="text-slate-700">{drive.min_cgpa ?? 'None'}</strong> &bull; 
-                      Max Backlogs: <strong className="text-slate-700">{drive.max_active_backlogs ?? 0}</strong> &bull; 
-                      Package: <strong className="text-emerald-700">{drive.package_details || `${drive.package_lpa || '8.5'} LPA`}</strong>
+                      Min CGPA: <strong className="text-slate-700">{drive.eligibility_criteria?.min_cgpa ?? drive.min_cgpa ?? 'None'}</strong> &bull; 
+                      Max Backlogs: <strong className="text-slate-700">{drive.eligibility_criteria?.max_active_backlogs ?? drive.max_active_backlogs ?? 0}</strong> &bull; 
+                      Package: <strong className="text-emerald-700">{drive.package_details || (drive.package_lpa != null ? `${drive.package_lpa} LPA` : 'N/A')}</strong>
                     </p>
                   </div>
 
@@ -221,7 +245,7 @@ export default function StudentDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
-              {applications.length === 0 ? (
+              {!Array.isArray(applications) || applications.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-8 text-center text-slate-400">
                     You have not submitted any applications yet. Review open drives above to apply.
@@ -234,7 +258,9 @@ export default function StudentDashboard() {
                       {app.drive?.title || 'Campus Placement Drive'}
                     </td>
                     <td className="py-3.5 px-4 text-slate-500">
-                      {new Date(app.created_at).toLocaleDateString()}
+                      {app.applied_at || app.created_at
+                        ? new Date(app.applied_at || app.created_at).toLocaleDateString()
+                        : 'N/A'}
                     </td>
                     <td className="py-3.5 px-4">
                       <Badge
@@ -252,10 +278,14 @@ export default function StudentDashboard() {
                       </Badge>
                     </td>
                     <td className="py-3.5 px-4 text-slate-600">
-                      {app.current_round ? `Round: ${app.current_round}` : 'Pending review'}
+                      {app.current_round
+                        ? `Round: ${app.current_round}`
+                        : app.current_round_order
+                        ? `Round: ${app.current_round_order}`
+                        : 'Pending review'}
                     </td>
                     <td className="py-3.5 px-4 text-right text-slate-500">
-                      {app.feedback || 'In process'}
+                      {app.notes || app.rejection_reason || app.feedback || 'In process'}
                     </td>
                   </tr>
                 ))

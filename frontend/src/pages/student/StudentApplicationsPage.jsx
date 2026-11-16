@@ -16,7 +16,8 @@ export default function StudentApplicationsPage() {
       try {
         setLoading(true)
         const data = await driveService.getMyApplications()
-        setApplications(data || [])
+        const list = Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : [])
+        setApplications(list)
       } catch (err) {
         toastError('Failed to fetch your applications.')
       } finally {
@@ -66,7 +67,9 @@ export default function StudentApplicationsPage() {
                         {a.drive?.title || 'Campus Placement Drive'}
                       </td>
                       <td className="py-3.5 px-4 text-slate-500">
-                        {new Date(a.created_at).toLocaleDateString()}
+                        {a.applied_at || a.created_at
+                          ? new Date(a.applied_at || a.created_at).toLocaleDateString()
+                          : 'N/A'}
                       </td>
                       <td className="py-3.5 px-4">
                         <Badge
@@ -84,10 +87,14 @@ export default function StudentApplicationsPage() {
                         </Badge>
                       </td>
                       <td className="py-3.5 px-4 text-slate-600">
-                        {a.current_round ? `Round: ${a.current_round}` : 'Under initial review'}
+                        {a.current_round
+                          ? `Round: ${a.current_round}`
+                          : a.current_round_order
+                          ? `Round: ${a.current_round_order}`
+                          : 'Under initial review'}
                       </td>
                       <td className="py-3.5 px-4 text-right text-slate-500">
-                        {a.feedback || 'In process'}
+                        {a.notes || a.rejection_reason || a.feedback || 'In process'}
                       </td>
                     </tr>
                   ))

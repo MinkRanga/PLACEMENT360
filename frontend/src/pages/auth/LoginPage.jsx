@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import {
   Layers,
   Mail,
   Lock,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   GraduationCap,
   Building2,
@@ -22,10 +23,23 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  const { login } = useAuth()
+  const { user, login, isLoading } = useAuth()
   const { success, error: toastError } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (user.role === 'TPO_ADMIN') {
+        navigate('/admin/dashboard', { replace: true })
+      } else if (user.role === 'RECRUITER') {
+        navigate('/recruiter/dashboard', { replace: true })
+      } else if (user.role === 'STUDENT') {
+        navigate('/student/dashboard', { replace: true })
+      }
+    }
+  }, [user, isLoading, navigate])
 
   // Pre-configured test accounts for quick demo evaluation
   const demoAccounts = [
@@ -95,6 +109,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-500 selection:text-white">
+      {/* Top Back Navigation */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0 mb-4">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span>&larr; Back to Home</span>
+        </Link>
+      </div>
+
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link to="/" className="inline-flex items-center gap-3 group">
@@ -188,8 +213,8 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Registration Redirects */}
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2">
+          {/* Registration Redirects & Back to Home */}
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-3">
             <p className="text-xs text-slate-500">
               Don't have an account yet?
             </p>
@@ -206,6 +231,15 @@ export default function LoginPage() {
                 className="text-indigo-600 hover:text-indigo-800 transition-colors"
               >
                 Recruiter Portal &rarr;
+              </Link>
+            </div>
+            <div className="pt-1">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Return to Landing Page</span>
               </Link>
             </div>
           </div>

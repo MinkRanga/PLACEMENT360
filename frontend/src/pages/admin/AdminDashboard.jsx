@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   Users,
   Briefcase,
@@ -28,6 +29,7 @@ import { driveService } from '../../services/driveService'
 import { useToast } from '../../hooks/useToast'
 
 export default function AdminDashboard() {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [summary, setSummary] = useState(null)
   const [deptStats, setDeptStats] = useState([])
@@ -124,9 +126,7 @@ const funnelData = Array.isArray(funnel?.stages)
     <Button
       variant="ghost"
       size="sm"
-      onClick={() => {
-        window.location.href = '/admin/drives'
-      }}
+      onClick={() => navigate('/admin/drives')}
     >
       View All Drives &rarr;
     </Button>
@@ -151,21 +151,18 @@ const funnelData = Array.isArray(funnel?.stages)
 
         <div className="flex flex-wrap items-center gap-3">
           <Button
-            variant="outline"
+            variant="outlineDark"
             size="sm"
             onClick={fetchDashboardData}
             iconLeft={RefreshCw}
-            className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
           >
             Refresh Data
           </Button>
           <Button
-            variant="emerald"
+            variant="primary"
             size="sm"
             iconLeft={Plus}
-            onClick={() => {
-              window.location.href = '/admin/drives'
-            }}
+            onClick={() => navigate('/admin/drives')}
           >
             Create New Drive
           </Button>
@@ -337,19 +334,21 @@ const funnelData = Array.isArray(funnel?.stages)
                     </td>
                     <td className="py-3.5 px-4 text-slate-600">{d.job_role}</td>
                     <td className="py-3.5 px-4 font-mono font-medium text-slate-700">
-                      {d.min_cgpa ? `${d.min_cgpa} CGPA` : 'Open'}
+                      {d.eligibility_criteria?.min_cgpa ?? d.min_cgpa ? `${d.eligibility_criteria?.min_cgpa ?? d.min_cgpa} CGPA` : 'Open'}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-slate-700">
-                      {d.max_active_backlogs ?? 0} Max
+                      {d.eligibility_criteria?.max_active_backlogs ?? d.max_active_backlogs ?? 0} Max
                     </td>
                     <td className="py-3.5 px-4 font-semibold text-emerald-700">
-                      {d.package_details || `${d.package_lpa || '8.5'} LPA`}
+                      {d.package_details || (d.package_lpa != null ? `${d.package_lpa} LPA` : 'N/A')}
                     </td>
                     <td className="py-3.5 px-4">
                       <Badge
                         variant={
-                          d.status === 'ACTIVE'
+                          d.status === 'REGISTRATION_OPEN' || d.status === 'IN_PROGRESS'
                             ? 'success'
+                            : d.status === 'ANNOUNCED'
+                            ? 'info'
                             : d.status === 'COMPLETED'
                             ? 'neutral'
                             : 'warning'
@@ -359,12 +358,12 @@ const funnelData = Array.isArray(funnel?.stages)
                       </Badge>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <a
-                        href="/admin/drives"
+                      <Link
+                        to="/admin/drives"
                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
                       >
                         Manage &rarr;
-                      </a>
+                      </Link>
                     </td>
                   </tr>
                 ))

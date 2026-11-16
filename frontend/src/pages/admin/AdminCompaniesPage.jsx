@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Building2, Globe, Search, Plus, ExternalLink } from 'lucide-react'
+import { Globe, Search } from 'lucide-react'
 import Card from '../../components/common/Card'
 import Badge from '../../components/common/Badge'
 import Input from '../../components/common/Input'
@@ -30,8 +30,8 @@ export default function AdminCompaniesPage() {
 
   const filtered = companies.filter(
     (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.industry.toLowerCase().includes(search.toLowerCase())
+      c.name?.toLowerCase().includes(search.toLowerCase()) ||
+      (c.industry && c.industry.toLowerCase().includes(search.toLowerCase()))
   )
 
   return (
@@ -82,7 +82,7 @@ export default function AdminCompaniesPage() {
                       <td className="py-3.5 px-4 font-bold text-slate-900">{c.name}</td>
                       <td className="py-3.5 px-4 text-slate-600">{c.industry}</td>
                       <td className="py-3.5 px-4">
-                        <Badge variant="info">{c.tier.replace('_', ' ')}</Badge>
+                        <Badge variant="info">{c.tier ? c.tier.replace('_', ' ') : 'STANDARD'}</Badge>
                       </td>
                       <td className="py-3.5 px-4">
                         {c.website ? (

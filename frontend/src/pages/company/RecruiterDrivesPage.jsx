@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import Card from '../../components/common/Card'
 import Badge from '../../components/common/Badge'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
@@ -10,12 +11,29 @@ export default function RecruiterDrivesPage() {
   const [loading, setLoading] = useState(true)
   const { error: toastError } = useToast()
 
+  const getStatusVariant = (status) => {
+    switch (status) {
+      case 'REGISTRATION_OPEN':
+      case 'IN_PROGRESS':
+        return 'success'
+      case 'ANNOUNCED':
+        return 'info'
+      case 'COMPLETED':
+        return 'neutral'
+      case 'CANCELLED':
+        return 'danger'
+      default:
+        return 'warning'
+    }
+  }
+
   useEffect(() => {
     async function load() {
       try {
         setLoading(true)
         const data = await driveService.getDrives()
-        setDrives(data || [])
+        const list = Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : [])
+        setDrives(list)
       } catch (error) {
         toastError('Failed to load corporate drives.')
       } finally {
@@ -23,7 +41,7 @@ export default function RecruiterDrivesPage() {
       }
     }
     load()
-  }, [toastError])
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -51,12 +69,13 @@ export default function RecruiterDrivesPage() {
                   <th className="py-3 px-4">Min CGPA</th>
                   <th className="py-3 px-4">Package</th>
                   <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
                 {drives.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-400">
+                    <td colSpan={6} className="py-8 text-center text-slate-400">
                       No recruitment drives active.
                     </td>
                   </tr>
@@ -66,15 +85,23 @@ export default function RecruiterDrivesPage() {
                       <td className="py-3.5 px-4 font-bold text-slate-900">{d.title}</td>
                       <td className="py-3.5 px-4 text-slate-600">{d.job_role}</td>
                       <td className="py-3.5 px-4 font-mono font-medium text-slate-700">
-                        {d.min_cgpa ? `${d.min_cgpa} CGPA` : 'Open'}
+                        {d.eligibility_criteria?.min_cgpa ?? d.min_cgpa ? `${d.eligibility_criteria?.min_cgpa ?? d.min_cgpa} CGPA` : 'Open'}
                       </td>
                       <td className="py-3.5 px-4 font-semibold text-emerald-700">
                         {d.package_details || (d.package_lpa != null ? `${d.package_lpa} LPA` : 'Not specified')}
                       </td>
                       <td className="py-3.5 px-4">
-                        <Badge variant={d.status === 'ACTIVE' ? 'success' : 'neutral'}>
+                        <Badge variant={getStatusVariant(d.status)}>
                           {d.status}
                         </Badge>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link
+                          to="/recruiter/applications"
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                        >
+                          Candidates &rarr;
+                        </Link>
                       </td>
                     </tr>
                   ))

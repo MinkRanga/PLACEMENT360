@@ -153,7 +153,7 @@ export default function AdminReportsPage() {
           </p>
         </div>
         <Button
-          variant="secondary"
+          variant="primary"
           size="sm"
           iconLeft={Download}
           onClick={handleExport}
