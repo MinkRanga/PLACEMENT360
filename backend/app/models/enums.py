@@ -1,0 +1,94 @@
+import enum
+
+
+class UserRole(str, enum.Enum):
+    TPO_ADMIN = "TPO_ADMIN"
+    STUDENT = "STUDENT"
+    RECRUITER = "RECRUITER"
+
+
+class Gender(str, enum.Enum):
+    MALE = "MALE"
+    FEMALE = "FEMALE"
+    OTHER = "OTHER"
+
+
+class StudentPlacementStatus(str, enum.Enum):
+    UNPLACED = "UNPLACED"
+    PLACED = "PLACED"
+    OPTED_OUT = "OPTED_OUT"
+
+
+class CompanyTier(str, enum.Enum):
+    TIER_1 = "TIER_1"
+    TIER_2 = "TIER_2"
+    TIER_3 = "TIER_3"
+    DREAM = "DREAM"
+    SUPER_DREAM = "SUPER_DREAM"
+
+
+class DriveType(str, enum.Enum):
+    FULL_TIME = "FULL_TIME"
+    INTERNSHIP = "INTERNSHIP"
+    INTERN_PLUS_FTE = "INTERN_PLUS_FTE"
+
+
+class DriveStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    ANNOUNCED = "ANNOUNCED"
+    REGISTRATION_OPEN = "REGISTRATION_OPEN"
+    REGISTRATION_CLOSED = "REGISTRATION_CLOSED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+
+class GenderAllowed(str, enum.Enum):
+    ALL = "ALL"
+    MALE_ONLY = "MALE_ONLY"
+    FEMALE_ONLY = "FEMALE_ONLY"
+
+
+class ApplicationStatus(str, enum.Enum):
+    APPLIED = "APPLIED"
+    ELIGIBLE = "ELIGIBLE"
+    SHORTLISTED = "SHORTLISTED"
+    IN_PROCESS = "IN_PROCESS"
+    SELECTED = "SELECTED"
+    REJECTED = "REJECTED"
+    WITHDRAWN = "WITHDRAWN"
+
+
+class RoundType(str, enum.Enum):
+    ONLINE_TEST = "ONLINE_TEST"
+    TECHNICAL_INTERVIEW = "TECHNICAL_INTERVIEW"
+    GROUP_DISCUSSION = "GROUP_DISCUSSION"
+    HR_INTERVIEW = "HR_INTERVIEW"
+    MANAGERIAL = "MANAGERIAL"
+    OTHER = "OTHER"
+
+
+class InterviewStatus(str, enum.Enum):
+    SCHEDULED = "SCHEDULED"
+    ATTENDED = "ATTENDED"
+    ABSENT = "ABSENT"
+    PASSED = "PASSED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+
+class OfferStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    REVOKED = "REVOKED"
+    EXPIRED = "EXPIRED"
+
+
+class NotificationType(str, enum.Enum):
+    DRIVE_ANNOUNCEMENT = "DRIVE_ANNOUNCEMENT"
+    ELIGIBILITY_ALERT = "ELIGIBILITY_ALERT"
+    INTERVIEW_SCHEDULED = "INTERVIEW_SCHEDULED"
+    OFFER_RELEASED = "OFFER_RELEASED"
+    DEADLINE_REMINDER = "DEADLINE_REMINDER"
+    SYSTEM_ALERT = "SYSTEM_ALERT"
