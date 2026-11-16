@@ -168,6 +168,7 @@ def update_drive(
 
     update_dict = payload.model_dump(exclude_unset=True)
     dept_ids = update_dict.pop("allowed_department_ids", None)
+    crit_update = update_dict.pop("eligibility_criteria", None)
 
     for field, val in update_dict.items():
         setattr(drive, field, val)
@@ -175,6 +176,15 @@ def update_drive(
     if dept_ids is not None:
         depts = db.query(Department).filter(Department.id.in_(dept_ids)).all()
         drive.allowed_departments = depts
+
+    if crit_update is not None:
+        if drive.eligibility_criteria:
+            for c_field, c_val in crit_update.items():
+                if c_val is not None:
+                    setattr(drive.eligibility_criteria, c_field, c_val)
+        else:
+            criteria = EligibilityCriteria(drive_id=drive.id, **crit_update)
+            db.add(criteria)
 
     db.commit()
     db.refresh(drive)

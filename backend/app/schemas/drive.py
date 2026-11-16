@@ -116,6 +116,7 @@ class PlacementDriveUpdate(BaseModel):
     drive_date: Optional[datetime] = None
     batch_year: Optional[int] = None
     allowed_department_ids: Optional[List[UUID]] = None
+    eligibility_criteria: Optional[EligibilityCriteriaUpdate] = None
 
 
 class PlacementDriveStatusUpdate(BaseModel):
